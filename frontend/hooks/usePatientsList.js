@@ -18,39 +18,41 @@ export default function usePatientsList() {
   useEffect(_ => {
     if (!q.length)
       setData([]) // empty data set
-    return _ => {
-    }
+    return _ => { }
   }, [q])
 
-  useEffect(async _ => {
+  useEffect(_ => {
     try {
-      // store data in local storage every time it updates
-      await AsyncStorage.setItem(PATIENT_LIST_KEY, JSON.stringify({
-        time: new Date().toISOString(), //
-        data: data
-      }))
+      if (data.length)
+        // store data in local storage every time it updates
+        AsyncStorage.setItem(PATIENT_LIST_KEY, JSON.stringify({
+          time: new Date().toISOString(), //
+          data: data
+        }))
+      else AsyncStorage.clear()
     } catch (error) {
       console.error(error);
 
     }
-    return _ => {
-    }
+    return _ => { }
   }, [data])
 
-  useEffect(async _ => { // for restoring local cache
+  useEffect(_ => { // for restoring local cache
     try {
-      const dataList = await AsyncStorage.getItem(PATIENT_LIST_KEY)
-      if (dataList) {
-        const parsedData = JSON.parse(dataList)
-        setData(parsedData.data)
-        setUpdateTime(parsedData.time)
-      }
+      AsyncStorage.getItem(PATIENT_LIST_KEY)
+        .then(dataList => {
+
+          if (dataList) {
+            const parsedData = JSON.parse(dataList)
+            setData(parsedData.data)
+            setUpdateTime(parsedData.time)
+          }
+        })
     } catch (error) {
       console.log(error);
     }
 
-    return _ => {
-    }
+    return _ => { }
   }, [])
 
   const resyncPatientList = _ => {
