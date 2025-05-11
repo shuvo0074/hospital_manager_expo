@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { fetchPatients } from '../services/api';
 import { Alert } from 'react-native';
 import useDebounce from './useDebounce';
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
 export default function usePatientsList() {
   const [q, setQ] = useState('');
   const debouncedQ = useDebounce(q);
@@ -9,11 +11,47 @@ export default function usePatientsList() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [next, setNext] = useState(true);
+  const [updateTime, setUpdateTime] = useState('')
+
+  const PATIENT_LIST_KEY = "PATIENT_LIST_KEY"
 
   useEffect(_ => {
     if (!q.length)
       setData([]) // empty data set
+    return _ => {
+    }
   }, [q])
+
+  useEffect(async _ => {
+    try {
+      // store data in local storage every time it updates
+      await AsyncStorage.setItem(PATIENT_LIST_KEY, JSON.stringify({
+        time: new Date().toISOString(), //
+        data: data
+      }))
+    } catch (error) {
+      console.error(error);
+
+    }
+    return _ => {
+    }
+  }, [data])
+
+  useEffect(async _ => { // for restoring local cache
+    try {
+      const dataList = await AsyncStorage.getItem(PATIENT_LIST_KEY)
+      if (dataList) {
+        const parsedData = JSON.parse(dataList)
+        setData(parsedData.data)
+        setUpdateTime(parsedData.time)
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    return _ => {
+    }
+  }, [])
 
   const resyncPatientList = _ => {
     if (!next) Alert.alert("Error!", "No more Patient");
@@ -34,6 +72,6 @@ export default function usePatientsList() {
   }
 
   return {
-    searchQuery: q, setSearchQuery: setQ, data, loading, resyncPatientList
+    searchQuery: q, setSearchQuery: setQ, data, loading, resyncPatientList, updateTime
   };
 }
