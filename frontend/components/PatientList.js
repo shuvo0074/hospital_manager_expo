@@ -32,7 +32,7 @@ export default function PatientList({ navigation }) {
     <View
       style={{
         backgroundColor: '#e3e3e3',
-        height: height - 150,
+        height: 70,
         alignItems: 'center',
         justifyContent: 'center'
       }}
