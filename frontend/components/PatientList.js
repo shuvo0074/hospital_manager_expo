@@ -34,7 +34,8 @@ export default function PatientList({ navigation }) {
         backgroundColor: '#e3e3e3',
         height: 70,
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        marginBottom: 20
       }}
     >
       <Text
