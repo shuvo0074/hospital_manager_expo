@@ -56,8 +56,9 @@ export default function usePatientsList() {
   }, [])
 
   const resyncPatientList = _ => {
-    if (!next) Alert.alert("Error!", "No more Patient");
-    else if (loading) Alert.alert("Error!", "loading Patients");
+
+    if (!next) return;
+    else if (loading) return;
     else if (!q.length) return;
     // else if (!q.length) Alert.alert("Error!", "Please search for a patient name above");
     else {
@@ -74,6 +75,6 @@ export default function usePatientsList() {
   }
 
   return {
-    searchQuery: q, setSearchQuery: setQ, data, loading, resyncPatientList, updateTime
+    searchQuery: q, setSearchQuery: setQ, data, loading, resyncPatientList, updateTime, page
   };
 }
