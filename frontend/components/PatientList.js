@@ -6,7 +6,7 @@ import usePatientsList from '../hooks/usePatientsList';
 
 export default function PatientList({ navigation }) {
 
-  const { searchQuery, setSearchQuery, data, loading, resyncPatientList, updateTime } = usePatientsList()
+  const { searchQuery, setSearchQuery, data, loading, resyncPatientList, updateTime, page } = usePatientsList()
   const { height } = Dimensions.get('screen')
 
   // show text to user if there is no patient visible on screen
@@ -50,8 +50,7 @@ export default function PatientList({ navigation }) {
 
   useEffect(() => {
     resyncPatientList()
-    return _ => {
-    }
+    return _ => { }
   }, []);
 
 
