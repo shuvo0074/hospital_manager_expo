@@ -55,6 +55,11 @@ export default function usePatientsList() {
     return _ => { }
   }, [])
 
+  useEffect(_ => {
+    resyncPatientList()
+    return _ => { }
+  }, [debouncedQ])
+
   const resyncPatientList = _ => {
 
     if (!next) return;
