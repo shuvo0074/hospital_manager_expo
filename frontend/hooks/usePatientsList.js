@@ -16,8 +16,10 @@ export default function usePatientsList() {
   const PATIENT_LIST_KEY = "PATIENT_LIST_KEY"
 
   useEffect(_ => {
-    if (!q.length)
+    if (!q.length) {
+      setUpdateTime('') // no update time
       setData([]) // empty data set
+    }
     return _ => { }
   }, [q])
 
@@ -56,20 +58,25 @@ export default function usePatientsList() {
   }, [])
 
   useEffect(_ => {
+    // reset data for q change
+    setData([])
+    setNext(true)
+    setPage(1)
+
+
     resyncPatientList()
     return _ => { }
   }, [debouncedQ])
 
   const resyncPatientList = _ => {
 
-    if (!next) return;
-    else if (loading) return;
-    else if (!q.length) return;
-    // else if (!q.length) Alert.alert("Error!", "Please search for a patient name above");
-    else {
+    if (!next || loading) return;
+    else if (q.length) {
       setLoading(true);
       fetchPatients(debouncedQ, page + 1).then(res => {
-        setData(d => [...d, ...res.data]);
+        if (data.length)
+          setData(d => [...d, ...res.data]);
+        else setData(res.data) // no patients found for this search
         setNext(!!res.nextPage);
         setPage(p => p + 1);
         setLoading(false);
