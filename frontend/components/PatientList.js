@@ -6,7 +6,7 @@ import usePatientsList from '../hooks/usePatientsList';
 
 export default function PatientList({ navigation }) {
 
-  const { searchQuery, setSearchQuery, data, loading, resyncPatientList } = usePatientsList()
+  const { searchQuery, setSearchQuery, data, loading, resyncPatientList, updateTime } = usePatientsList()
   const { height } = Dimensions.get('screen')
 
   // show text to user if there is no patient visible on screen
@@ -28,10 +28,30 @@ export default function PatientList({ navigation }) {
       </Text>
     </View>
   )
+  const LastUpdatedTime = _ => (
+    <View
+      style={{
+        backgroundColor: '#e3e3e3',
+        height: height - 150,
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}
+    >
+      <Text
+        style={{
+          textAlign: 'center'
+        }}
+      >
+        Last updated at: {updateTime}
+      </Text>
+    </View>
+  )
 
 
   useEffect(() => {
     resyncPatientList()
+    return _ => {
+    }
   }, []);
 
 
@@ -58,6 +78,7 @@ export default function PatientList({ navigation }) {
           keyExtractor={i => i.id}
           onEndReached={loadMore}
           onEndReachedThreshold={0.2}
+          ListHeaderComponent={updateTime?.length ? <LastUpdatedTime /> : null}
           ListFooterComponent={loading ? <ActivityIndicator /> : null}
           ListEmptyComponent={<ListEmptyComponent />}
           renderItem={({ item }) => (
