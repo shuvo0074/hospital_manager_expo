@@ -2,14 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { View, TextInput, FlatList, Text, Button, ActivityIndicator, Dimensions, Alert } from 'react-native';
 import { fetchPatients } from '../services/api';
 import useDebounce from '../hooks/useDebounce';
+import usePatientsList from '../hooks/usePatientsList';
 
 export default function PatientList({ navigation }) {
-  const [q, setQ] = useState('');
-  const debouncedQ = useDebounce(q);
-  const [data, setData] = useState([]);
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [next, setNext] = useState(true);
+
+  const { searchQuery, setSearchQuery, data, loading, resyncPatientList } = usePatientsList()
   const { height } = Dimensions.get('screen')
 
   // show text to user if there is no patient visible on screen
@@ -34,45 +31,23 @@ export default function PatientList({ navigation }) {
 
 
   useEffect(() => {
-    if (q.length) { // if search query is not empty
-      setLoading(true);
-      fetchPatients(debouncedQ, 1).then(res => {
-        setData(res.data);
-        setNext(!!res.nextPage);
-        setPage(1);
-        setLoading(false);
-        if (res.error)
-          Alert.alert("Error!", res.error)
-      });
-    }
-  }, [debouncedQ]);
+    resyncPatientList()
+  }, []);
 
-  useEffect(_ => {
-    if (!q.length)
-      setData([])
-  }, [q])
+
 
   const loadMore = () => {
     // end reached threshold for flatlist is set to 0.2, which means if last two items are visible, the flatlist will load more data
     // Load more is being called twice for the first time because all 10 items are displayed because of large screen height and it is reaching the threshold
-    if (!next || loading || !q.length) return;
-    setLoading(true);
-    fetchPatients(debouncedQ, page + 1).then(res => {
-      setData(d => [...d, ...res.data]);
-      setNext(!!res.nextPage);
-      setPage(p => p + 1);
-      setLoading(false);
-      if (res.error)
-        Alert.alert("Error!", res.error)
-    });
+    resyncPatientList()
   };
 
   return (
     <View style={{ flex: 1, padding: 16 }}>
       <TextInput
         placeholder="Search patients…"
-        value={q}
-        onChangeText={setQ}
+        value={searchQuery}
+        onChangeText={setSearchQuery}
         style={{ marginBottom: 12, borderWidth: 1, padding: 8 }}
       />
       {loading && page === 1 ? (
